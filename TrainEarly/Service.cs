@@ -92,9 +92,11 @@ namespace TrainEarly
             {
                 DateTime expectedTs = UnixTsToDateTime(double.Parse((string)response.body.gbtt_timestamp));
                 DateTime? actualTs = null;
+                // actual time stamp property name seems to get corrupted
+                // so just search for anything containing "act"
                 foreach (var value in response.body)
                 {
-                    if (value.Name.Contains("actu"))
+                    if (value.Name.Contains("act"))
                     {
                         actualTs = UnixTsToDateTime(double.Parse((string)value.Value));
                         break;
