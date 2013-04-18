@@ -65,6 +65,7 @@ namespace TrainEarly
         private static readonly string _twitterConsumerSecret = ConfigurationManager.AppSettings["twitter:consumerSecret"];
         private static readonly string _twitterAccessToken = ConfigurationManager.AppSettings["twitter:accessToken"];
         private static readonly string _twitterAccessTokenSecret = ConfigurationManager.AppSettings["twitter:accessTokenSecret"];
+        private static readonly TrainDetailsRepository _repository = new TrainDetailsRepository();
 
         protected override void OnStart(string[] args)
         {
@@ -105,12 +106,31 @@ namespace TrainEarly
 
                 if (actualTs.HasValue && actualTs < expectedTs)
                 {
+                    string trainId = (string)response.body.train_id;
                     string tweet = string.Format("Train {0} expected to depart at {1:HH:mm:ss} actual departure {2:HH:mm:ss} - {3}{4}",
-                        (string)response.body.train_id,
+                        trainId,
                         expectedTs,
                         actualTs,
                         _url,
-                        (string)response.body.train_id);
+                        trainId);
+
+                    try
+                    {
+                        var train = _repository.GetTrain(trainId);
+                        if (train != null)
+                        {
+                            tweet = string.Format("Train {0} from {1} to {2} expected to depart at {3:HH:mm:ss} actual at {4:HH:mm:ss} {5}{6}/{7:YYYY/MM/dd}",
+                                train.TrainUid,
+                                train.OriginCRS,
+                                train.DestinationCRS,
+                                expectedTs,
+                                actualTs,
+                                _url,
+                                train.TrainUid,
+                                (DateTime)train.OriginDepartTimestamp);
+                        }
+                    }
+                    catch { }
 
                     Trace.TraceInformation(tweet);
                     Trace.Flush();
