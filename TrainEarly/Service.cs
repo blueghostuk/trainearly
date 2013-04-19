@@ -119,7 +119,7 @@ namespace TrainEarly
                         var train = _repository.GetTrain(trainId);
                         if (train != null)
                         {
-                            tweet = string.Format("Train {0} from {1} to {2} expected to depart at {3:HH:mm:ss} actual at {4:HH:mm:ss} {5}{6}/{7:YYYY/MM/dd}",
+                            tweet = string.Format("Train {0} from {1} to {2} expected to depart at {3:HH:mm:ss} actual at {4:HH:mm:ss} {5}{6}/{7:yyyy/MM/dd}",
                                 train.TrainUid,
                                 train.OriginCRS,
                                 train.DestinationCRS,
