@@ -119,9 +119,11 @@ namespace TrainEarly
                         var train = _repository.GetTrain(trainId);
                         if (train != null)
                         {
-                            tweet = string.Format("Train {0} from {1} to {2} expected to depart at {3:HH:mm:ss} actual at {4:HH:mm:ss} {5}{6}/{7:yyyy/MM/dd}",
-                                train.TrainUid,
+                            tweet = string.Format("{0} from {1}({2}) to {3}({4}) expected to depart {5:HH:mm:ss}, actual {6:HH:mm:ss} {7}{8}/{9:yyyy/MM/dd}",
+                                train.Headcode,
+                                train.OriginName,
                                 train.OriginCRS,
+                                train.DestinationName,
                                 train.DestinationCRS,
                                 expectedTs,
                                 actualTs,
@@ -175,6 +177,7 @@ namespace TrainEarly
 
             serviceInstaller.DisplayName = "TrainNotifier Train Early Twitter Notifier";
             serviceInstaller.StartType = ServiceStartMode.Automatic;
+            serviceInstaller.ServicesDependedOn = new[] { "TrainNotiferWsServer" };
 
             //must be the same as what was set in Program's constructor
             serviceInstaller.ServiceName = "TrainNotiferTrainEarlyTwitterNofifier";

@@ -15,8 +15,11 @@ namespace TrainEarly
                 SELECT TOP 1
                     [LiveTrain].[OriginDepartTimestamp]
                     ,[ScheduleTrain].[TrainUid]
+                    ,[ScheduleTrain].[Headcode]
                     ,[OriginTiploc].[CRS] AS [OriginCRS]
+                    ,[OriginTiploc].[Description] AS [OriginName]
                     ,[DestinationTiploc].[CRS] AS [DestinationCRS]
+                    ,[DestinationTiploc].[Description] AS [DestinationName]
                 FROM [LiveTrain]
                 INNER JOIN [ScheduleTrain] ON [LiveTrain].[ScheduleTrain] = [ScheduleTrain].[ScheduleId]
                 INNER JOIN  [Tiploc] [OriginTiploc] ON [ScheduleTrain].[OriginStopTiplocId] = [OriginTiploc].[TiplocId]
