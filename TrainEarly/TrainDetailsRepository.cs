@@ -15,7 +15,7 @@ namespace TrainEarly
                 SELECT TOP 1
                     [LiveTrain].[OriginDepartTimestamp]
                     ,[ScheduleTrain].[TrainUid]
-                    ,[ScheduleTrain].[Headcode]
+                    ,[LiveTrain].[Headcode]
                     ,[OriginTiploc].[CRS] AS [OriginCRS]
                     ,[OriginTiploc].[Description] AS [OriginName]
                     ,[DestinationTiploc].[CRS] AS [DestinationCRS]
