@@ -77,11 +77,18 @@ namespace TrainEarly
             Trace.TraceInformation("Connecting to server on {0}", wsServer);
             _wsClient = new WebSocketClient(wsServer)
             {
-                OnReceive = OnReceive
+                OnReceive = OnReceive,
+                OnDisconnect = OnDisconnect
             };
             _wsClient.Connect();
             Trace.TraceInformation("Subscribing to stanox {0}", stanox);
             _wsClient.Send(string.Format("substanox:{0}", stanox));
+        }
+
+        private void OnDisconnect(UserContext context)
+        {
+            Trace.TraceInformation("Disconnected. Reconnecting");
+            _wsClient.Connect();
         }
 
         private static void OnReceive(UserContext context)

@@ -56,10 +56,6 @@ namespace TrainEarly
                 }
             }
         }
-        protected virtual Guid ExecuteInsert(string sql, dynamic parameters = null, DbConnection existingConnection = null)
-        {
-            return ExecuteScalar<Guid>(sql, parameters, existingConnection);
-        }
 
         protected virtual T ExecuteScalar<T>(string sql, dynamic parameters = null, DbConnection existingConnection = null)
         {
