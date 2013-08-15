@@ -41,7 +41,7 @@
       <HintPath>packages\Alchemy.2.2.1\lib\net40\Alchemy.dll</HintPath>
     </Reference>
     <Reference Include="Dapper">
-      <HintPath>packages\Dapper.1.12.1\lib\net40\Dapper.dll</HintPath>
+      <HintPath>packages\Dapper.1.13\lib\net45\Dapper.dll</HintPath>
     </Reference>
     <Reference Include="Essential.Diagnostics">
       <HintPath>packages\Essential.Diagnostics.1.1.20103.0\lib\Essential.Diagnostics.dll</HintPath>
