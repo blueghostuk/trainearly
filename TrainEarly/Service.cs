@@ -9,6 +9,9 @@ using System.Diagnostics;
 using System.Reflection;
 using System.ServiceProcess;
 using TweetSharp;
+using System.Linq;
+using System.Text;
+using System.Collections.Generic;
 
 namespace TrainEarly
 {
@@ -67,12 +70,41 @@ namespace TrainEarly
         private static readonly string _twitterAccessTokenSecret = ConfigurationManager.AppSettings["twitter:accessTokenSecret"];
         private static readonly TrainDetailsRepository _repository = new TrainDetailsRepository();
 
+        private static double? Latitude;
+        private static double? Longitude;
+
+        private static Delays _statistics;
+
         protected override void OnStart(string[] args)
         {
             string wsServer = ConfigurationManager.AppSettings["ws-server"];
             string stanox = ConfigurationManager.AppSettings["stanox"];
             if (string.IsNullOrEmpty(wsServer) || string.IsNullOrEmpty(stanox))
                 throw new ArgumentNullException("", "both ws-server and stanox must be set in app.config");
+
+            _statistics = Delays.Load();
+            if (_statistics.Created.Date < DateTime.Now.Date)
+            {
+                const string start = "Early Departure for {0:dd-MM-YY}:";
+                var statsByMinute = _statistics.EarlyDepartures.GroupBy(v => v);
+                ICollection<string> values = new List<string>(statsByMinute.Count());
+                const string format = "{0}mins:{1}";
+                foreach (var minutes in statsByMinute)
+                {
+                    values.Add(string.Format(format, minutes.Key, minutes.Count()));
+                }
+
+                SendTweet(string.Concat(string.Format(start, _statistics.Created), string.Join(",", values.ToArray())));
+                _statistics = Delays.NewInstance();
+                _statistics.Save();
+            }
+
+            double lat, lng;
+            if (double.TryParse(ConfigurationManager.AppSettings["Lat"], out lat) && double.TryParse(ConfigurationManager.AppSettings["Lng"], out lng))
+            {
+                Latitude = lat;
+                Longitude = lng;
+            }
 
             Trace.TraceInformation("Connecting to server on {0}", wsServer);
             _wsClient = new WebSocketClient(wsServer)
@@ -121,6 +153,10 @@ namespace TrainEarly
                         _url,
                         trainId);
 
+                    var minsEarly = (int)(expectedTs - actualTs).Value.TotalMinutes;
+                    _statistics.EarlyDepartures.Add(minsEarly);
+                    _statistics.Save();
+
                     try
                     {
                         var train = _repository.GetTrain(trainId);
@@ -144,13 +180,21 @@ namespace TrainEarly
                     Trace.TraceInformation(tweet);
                     Trace.Flush();
 
-                    var server = new TwitterService(_twitterConsumerKey, _twitterConsumerSecret, _twitterAccessToken, _twitterAccessTokenSecret);
-                    var status = server.SendTweet(new SendTweetOptions
-                    {
-                        Status = tweet
-                    });
+                    SendTweet(tweet);
                 }
             }
+        }
+
+        private static void SendTweet(string tweet)
+        {
+            var server = new TwitterService(_twitterConsumerKey, _twitterConsumerSecret, _twitterAccessToken, _twitterAccessTokenSecret);
+            var status = server.SendTweet(new SendTweetOptions
+            {
+                Status = tweet,
+                Lat = Latitude,
+                Long = Longitude,
+                DisplayCoordinates = Latitude.HasValue && Longitude.HasValue
+            });
         }
 
         private static readonly DateTime _epoch = new DateTime(1970, 1, 1);
