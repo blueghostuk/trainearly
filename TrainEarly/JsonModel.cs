@@ -8,12 +8,12 @@ namespace TrainEarly
     public class Delays
     {
         private static readonly string FileName = "stats.json";
-        public DateTime Created { get; private set; }
+        public DateTime Created { get; set; }
         public ICollection<int> EarlyDepartures { get; set; }
 
         public static Delays NewInstance()
         {
-            return new Delays { EarlyDepartures = new List<int>() };
+            return new Delays { Created = DateTime.UtcNow, EarlyDepartures = new List<int>() };
         }
 
         public void Save()
@@ -35,9 +35,9 @@ namespace TrainEarly
             }
         }
 
-        private Delays()
+        public Delays()
         {
-            Created = DateTime.UtcNow;
+
         }
     }
 }
