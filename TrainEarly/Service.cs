@@ -85,10 +85,10 @@ namespace TrainEarly
             _statistics = Delays.Load();
             if (_statistics.Created.Date < DateTime.Now.Date)
             {
-                const string start = "Early Departure for {0:dd-MM-YY}:";
+                const string start = "Early Departures for {0:dd-MM-yy}:";
                 var statsByMinute = _statistics.EarlyDepartures.GroupBy(v => v);
                 ICollection<string> values = new List<string>(statsByMinute.Count());
-                const string format = "{0}mins:{1}";
+                const string format = "{0} mins early:{1}";
                 foreach (var minutes in statsByMinute)
                 {
                     values.Add(string.Format(format, minutes.Key, minutes.Count()));
